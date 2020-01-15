@@ -1,4 +1,4 @@
-# Copyright (c) 2017, the WebKit for Windows project authors.  Please see the
+# Copyright (c) 2020, the WebKit for Windows project authors.  Please see the
 # AUTHORS file for details. All rights reserved. Use of this source code is
 # governed by a BSD-style license that can be found in the LICENSE file.
 
@@ -8,7 +8,8 @@
 
   .Description
   Downloads the specified release of Python and installs it silently on the
-  host. Additionally PIP and Visual C++ for Python are installed.
+  host. Additionally PIP is installed and Visual C++ for Python is installed
+  for python 2.
 
   .Parameter Version
   The version of Python to install.
@@ -36,11 +37,6 @@ Function Install-Python {
 
     $major, $minor, $patch = $version.split('.');
 
-    if ($major -ne '2') {
-        Write-Error 'Only Python version 2.x is usable for WebKit development';
-        return;
-    }
-
     $pythonUrl = ('https://www.python.org/ftp/python/{0}/python-{0}.amd64.msi' -f $version);
 
     $options = @(
@@ -62,8 +58,10 @@ Function Install-Python {
     python get-pip.py $pipInstall;
     Remove-Item get-pip.py -Force;
 
-    # Install Visual Studio for Python 2.7
-    $vcForPythonUrl = 'https://download.microsoft.com/download/7/9/6/796EF2E4-801B-4FC4-AB28-B59FBF6D907B/VCForPython27.msi';
+    if ($major -eq "2") {
+        # Install Visual Studio for Python 2.7
+        $vcForPythonUrl = 'https://download.microsoft.com/download/7/9/6/796EF2E4-801B-4FC4-AB28-B59FBF6D907B/VCForPython27.msi';
 
-    Install-FromMsi -Name 'VCForPython27' -Url $vcForPythonUrl -NoVerify;
+        Install-FromMsi -Name 'VCForPython27' -Url $vcForPythonUrl -NoVerify;
+    }
 }
